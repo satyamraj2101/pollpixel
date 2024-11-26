@@ -1,3 +1,4 @@
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\pages\MainPage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Vote, UserCircle2, Github, Linkedin, Mail } from 'lucide-react';

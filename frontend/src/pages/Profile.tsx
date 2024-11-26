@@ -1,3 +1,4 @@
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\pages\Profile.tsx
 import React from 'react';
 import { Share2, Calendar, Vote, User } from 'lucide-react';
 import Layout from '../components/Layout';

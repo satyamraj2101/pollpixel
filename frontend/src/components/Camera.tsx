@@ -1,3 +1,4 @@
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\components\Camera.tsx
 import React, { useCallback, useRef } from 'react';
 import Webcam from 'react-webcam';
 import { Camera as CameraIcon } from 'lucide-react';

@@ -1,3 +1,4 @@
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\components\Card.tsx
 import React from 'react';
 
 interface CardProps {

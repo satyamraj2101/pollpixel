@@ -1,3 +1,4 @@
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\components\Layout.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 

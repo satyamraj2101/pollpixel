@@ -1,3 +1,4 @@
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\pages\Dashboard.tsx
 import React from 'react';
 import { Clock, Users, Vote } from 'lucide-react';
 import Layout from '../components/Layout';

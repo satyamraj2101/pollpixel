@@ -1,50 +1,90 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// C:\Users\KIIT\WebstormProjects\PollPixel\frontend\src\context\AuthContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { jwtDecode } from 'jwt-decode'; // Recommend installing jwt-decode package
+
+interface TokenPayload {
+  userId: number;
+  iat: number;
+  exp: number;
+}
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  user: any;
-  login: (userData: any) => void;
+  token: string | null;
+  login: (token: string) => void;
   logout: () => void;
+  isTokenValid: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Check for stored auth token
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      setIsAuthenticated(true);
-      // TODO: Fetch user data
+  const isTokenValid = () => {
+    if (!token) return false;
+
+    try {
+      const decoded = jwtDecode<TokenPayload>(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Invalid token", error);
+      return false;
     }
-  }, []);
+  };
 
-  const login = (userData: any) => {
-    setIsAuthenticated(true);
-    setUser(userData);
-    localStorage.setItem('authToken', userData.token);
+  const login = (newToken: string) => {
+    try {
+      // Validate token before storing
+      const decoded = jwtDecode<TokenPayload>(newToken);
+      localStorage.setItem('authToken', newToken);
+      setToken(newToken);
+    } catch (error) {
+      console.error("Invalid token format", error);
+      logout(); // Clear any invalid token
+    }
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    localStorage.removeItem('authToken');
+    try {
+      localStorage.removeItem('authToken');
+      setToken(null);
+    } catch (error) {
+      console.error("Error removing token from localStorage", error);
+    }
   };
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+  useEffect(() => {
+    const savedToken = localStorage.getItem('authToken');
+    if (savedToken) {
+      // Validate saved token on app initialization
+      try {
+        const decoded = jwtDecode<TokenPayload>(savedToken);
+        const currentTime = Math.floor(Date.now() / 1000);
 
-export function useAuth() {
+        if (decoded.exp > currentTime) {
+          setToken(savedToken);
+        } else {
+          logout(); // Auto logout if token is expired
+        }
+      } catch (error) {
+        console.error("Saved token is invalid", error);
+        logout();
+      }
+    }
+  }, []);
+
+  return (
+      <AuthContext.Provider value={{ token, login, logout, isTokenValid }}>
+        {children}
+      </AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};
